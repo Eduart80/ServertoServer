@@ -12,10 +12,16 @@ app.use(express.urlencoded());
 app.get('/api/fun-fact', async (req,res)=>{
     try{
         const getData = await axios.get('https://uselessfacts.jsph.pl/api/v2/facts/random')
-        res.json(getData.data)
+       
+        res.json({"fact": getData.data.text})
     }catch(error){
-        console.log(`Error on server request ${error}`);
-        res.status(500).send("Server not responding")
+        if (error.response) {
+      console.error('API Error:', error.response.status, error.response.data);
+      res.status(error.response.status).json({ message: 'Error fetching data from external API.' });
+    } else {
+      console.error('Network Error:', error.message);
+      res.status(500).json({ message: "Could not fetch fun fact" });
+    }
     }
 })
 
